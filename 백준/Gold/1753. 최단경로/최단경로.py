@@ -20,17 +20,17 @@ for _ in range(e):
 def dijkstra(start):
     pQueue = []
     heapq.heappush(pQueue, (0,start))
-    
+    visited[start] = 0
+
     while pQueue:
         cost, s = heapq.heappop(pQueue)
  
-        if visited[s] <= cost:
+        if visited[s] < cost:
             continue
-
-        visited[s] = min(visited[s], cost)
 
         for v, w in graph[s]:
             if visited[v] > cost+w:
+                visited[v] = cost+w
                 heapq.heappush(pQueue, (cost+w, v))
         
 
