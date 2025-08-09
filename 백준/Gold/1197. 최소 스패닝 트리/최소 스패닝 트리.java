@@ -1,4 +1,5 @@
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,6 +31,7 @@ public class Main {
 
         Collections.sort(edges);
         int ans = 0;
+        int cnt = 0;
         for (Edge e : edges) {
             int from = e.v1;
             int to = e.v2;
@@ -40,6 +42,10 @@ public class Main {
 
             union(from, to);
             ans += cost;
+            cnt ++;
+            
+            if (cnt == V-1)
+                break;
 
         }
 
