@@ -1,104 +1,105 @@
 import java.util.*;
-
 class Solution {
-    static int size;
-    static boolean[] choice;
-    static int maxCnt;
-    static int answer[];
-    static int[][] dice;
     
+    static int N;
+    static boolean[] visited;
+    static ArrayList<Integer> aAll;
+    static ArrayList<Integer> bAll;
+    static int winCnt;
+    static int maxCnt = 0;
+    static int[] answer;
+
     public int[] solution(int[][] dice) {
-        size = dice.length;
-        choice = new boolean[size+1];
-        answer = new int[size/2];
-        backtracking(0, dice, 1);
+        N = dice.length;
+        visited = new boolean[N];
+        
+        for (int i=0;i<N;i++) {
+            visited[i] = true;
+            backtracking(i,1,dice);
+            visited[i] = false;
+        }
         
         return answer;
     }
     
-    static void backtracking(int depth, int[][] dice, int start) {
-        if (depth == size/2){
-            ArrayList<Integer> arrA = new ArrayList<>();
-            ArrayList<Integer> arrB = new ArrayList<>();
-            ArrayList<Integer> res = new ArrayList<>();
+    public void backtracking(int idx, int depth, int[][] dice) {
+        if (depth == N/2) {
+            ArrayList<Integer> a = new ArrayList<>();
+            ArrayList<Integer> b = new ArrayList<>();     
             
-            int winCnt = 0;
-            
-            for (int i=1;i<size+1;i++){
-                if (choice[i] == true) {
-                    res.add(i);
-                    ArrayList<Integer> tempA = new ArrayList<>();
-               
-                    for (int y: dice[i-1]) {
-                        if (arrA.size() == 0) {
-                            tempA.add(y);
-                        }
-                        else {
-                            for (int x: arrA) {
-                                tempA.add(x+y);
-                            }
-                        }
-                    }
-                    arrA.clear();
-                    for (int x: tempA) {
-                        arrA.add(x);
-                    }
-                } 
-                else {
-                    ArrayList<Integer> tempB = new ArrayList<>();
-
-                    for (int y: dice[i-1]) {
-                        if (arrB.size() == 0) {
-                            tempB.add(y);
-                        } else {
-                            for (int x: arrB) {
-                                tempB.add(x+y);
-                            }
-                        }
-                    }
-
-                    arrB.clear();
-                    for (int x: tempB) {
-                        arrB.add(x);
-                    }
-                }
+            for (int i=0;i<N;i++) {
+                if (visited[i]) 
+                    a.add(i);
+                else 
+                    b.add(i);
             }
             
-            Collections.sort(arrB);
-            for (int a: arrA) {
-                winCnt += binarySearch(a, arrB);
+            aAll = new ArrayList<>();
+            bAll = new ArrayList<>();
+            winCnt = 0;
+            
+            // for (int aa: a) {
+            //     System.out.print(aa + " ");
+            // }
+            // System.out.println();
+            
+            backtracking2(a,0,0,0,dice);
+            backtracking2(b,0,0,1,dice);
+        
+            Collections.sort(aAll);
+            Collections.sort(bAll);
 
-                if (winCnt > maxCnt) {
-                    maxCnt = winCnt;
-                    for (int i=0;i<size/2;i++) {
-                        answer[i] = res.get(i);
-                    }
+            for (int x: aAll) {
+                binarySearch(x, bAll);
+            }
+            
+            if (winCnt > maxCnt) {
+                maxCnt = winCnt;
+                answer = new int[a.size()];
+                for (int i=0;i<a.size();i++) {
+                    answer[i] = a.get(i)+1;
                 }
             }
             return;
         }
-        for (int i=start;i<size+1;i++){
-            choice[i] = true;
-            backtracking(depth+1, dice, i+1);
-            choice[i] = false;
+        
+        for (int i=idx+1;i<N;i++) {
+            visited[i] = true;
+            backtracking(i,depth+1,dice);
+            visited[i] = false;
         }
     }
     
-    static int binarySearch(int a, ArrayList<Integer> arrB) {
+    public void backtracking2(ArrayList<Integer> al, int idx, int sum, int type, int[][] dice) {
+        if (idx > (N/2-1)) {
+            if (type == 0) {
+                aAll.add(sum);
+            } else {
+                bAll.add(sum);
+            }
+            return;
+        }
+    
+        int diceIdx = al.get(idx);
+
+        for (int i=0;i<6;i++) {
+            int newSum = sum + dice[diceIdx][i];
+            backtracking2(al, idx+1, newSum, type, dice);
+        }
+    }
+    
+    public void binarySearch(int x, ArrayList<Integer> bs) {
         int left = 0;
-        int right = arrB.size() - 1;
-        int mid = 0;
+        int right = bs.size()-1;
+        
         while (left <= right) {
-            mid = (left + right) / 2;
-            if (arrB.get(mid) >= a) {
+            int mid = (left + right) / 2;
+            if (x > bs.get(mid)) {
+                left = mid + 1;
+            } else {
                 right = mid - 1;
             }
-            else {
-                left = mid + 1;
-            }
         }
-
-        return right;
+        winCnt+=right;
     }
-    
 }
