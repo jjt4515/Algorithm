@@ -1,22 +1,21 @@
 import java.util.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 class Solution {
     public long solution(int cap, int n, int[] deliveries, int[] pickups) {
+        int del = 0;
+        int pic = 0;
+        int idx = n-1;
         long answer = 0;
-        int d = 0;
-        int p = 0;
-        
-        for (int i=n-1;i>=0;i--) {
-            d -= deliveries[i];
-            p -= pickups[i];
-            
-            while (d < 0 || p < 0) {
-                d += cap;
-                p += cap;
-                answer += (i+1) *2;
+        while (idx >= 0) {
+            while (del < deliveries[idx] || pic < pickups[idx]) {
+                del += cap;
+                pic += cap;
+                answer += 2*(idx+1);
             }
+
+            del -= deliveries[idx];
+            pic -= pickups[idx];
+
+            idx--;
         }
         return answer;
     }
